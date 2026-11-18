@@ -1,0 +1,2 @@
+Double-click dashboard.html to open the interactive tool in your browser.
+No installation, no internet needed.
