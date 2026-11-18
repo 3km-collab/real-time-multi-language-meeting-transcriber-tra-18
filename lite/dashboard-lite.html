@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Real‑Time Multi‑Language Meeting Transcriber &amp; Translator (Lite)</title>
+<style>
+:root{--bg:#0b1220;--card:#111a2e;--ink:#e6edf7;--muted:#8aa0c0;--accent:#38bdf8;--ok:#22c55e;--warn:#f59e0b}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{padding:28px 24px;border-bottom:1px solid #1e2b45;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+h1{margin:0;font-size:22px}.sub{color:var(--muted);font-size:13px}
+.wrap{max-width:1200px;margin:0 auto;padding:24px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px}
+.card{background:var(--card);border:1px solid #1e2b45;border-radius:14px;padding:18px}
+.card .k{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+.card .v{font-size:28px;font-weight:800;margin-top:6px;color:var(--accent)}
+table{width:100%;border-collapse:collapse;background:var(--card);border-radius:14px;overflow:hidden;font-size:13px}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid #1e2b45}
+th{background:#0f1a2e;color:var(--muted);position:sticky;top:0;cursor:pointer}
+tr:hover td{background:#13203a}input{background:#0f1a2e;border:1px solid #1e2b45;color:var(--ink);padding:9px 12px;border-radius:10px;width:260px}
+.toolbar{display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.btn{background:var(--accent);color:#04121f;border:0;border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer}
+.pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700}
+.p-ok{background:rgba(34,197,94,.18);color:#4ade80}.p-warn{background:rgba(245,158,11,.18);color:#fbbf24}
+</style></head>
+<body>
+<header><div><h1>Real‑Time Multi‑Language Meeting Transcriber &amp; Translator (Lite)</h1><div class="sub">Interactive dashboard · by RealLabs · opens offline in your browser</div></div>
+<button class="btn" onclick="exportCsv()">⬇ Download CSV</button></header>
+<div class="wrap">
+  <div class="cards" id="cards"></div>
+  <div class="toolbar"><input id="q" placeholder="Search…" oninput="render()"/></div>
+  <div style="overflow:auto;max-height:70vh"><table id="tbl"></table></div>
+</div>
+<script>
+const DATA = [{"id": "R100000", "name": "Bright Healthcare 0", "category": "Real Estate", "region": "APAC", "value_usd": 4395.9, "quantity": 476, "score": 10.3, "active": false, "updated_at": "2024-01-09"}, {"id": "R100001", "name": "North Real Estate 1", "category": "Real Estate", "region": "APAC", "value_usd": 3473.61, "quantity": 374, "score": 24.9, "active": true, "updated_at": "2025-01-22"}, {"id": "R100002", "name": "Nova Retail 2", "category": "Real Estate", "region": "APAC", "value_usd": 1068.92, "quantity": 418, "score": 8.9, "active": true, "updated_at": "2025-07-26"}, {"id": "R100003", "name": "Peak Healthcare 3", "category": "SaaS", "region": "APAC", "value_usd": 4449.09, "quantity": 258, "score": 10.4, "active": false, "updated_at": "2024-12-03"}, {"id": "R100004", "name": "Alpha Logistics 4", "category": "Energy", "region": "Europe", "value_usd": 690.7, "quantity": 258, "score": 74.5, "active": false, "updated_at": "2024-03-16"}, {"id": "R100005", "name": "Blue Healthcare 5", "category": "Logistics", "region": "Europe", "value_usd": 2639.68, "quantity": 434, "score": 83.8, "active": true, "updated_at": "2024-01-05"}, {"id": "R100006", "name": "Bright Logistics 6", "category": "Logistics", "region": "LATAM", "value_usd": 2085.18, "quantity": 343, "score": 12.2, "active": true, "updated_at": "2025-09-22"}, {"id": "R100007", "name": "Blue E-Commerce 7", "category": "Fintech", "region": "MEA", "value_usd": 1804.35, "quantity": 288, "score": 88.0, "active": true, "updated_at": "2024-10-06"}, {"id": "R100008", "name": "North Healthcare 8", "category": "Manufacturing", "region": "Europe", "value_usd": 1602.15, "quantity": 468, "score": 18.1, "active": true, "updated_at": "2025-02-07"}, {"id": "R100009", "name": "Bright Logistics 9", "category": "Healthcare", "region": "LATAM", "value_usd": 2249.93, "quantity": 48, "score": 25.5, "active": true, "updated_at": "2024-03-20"}, {"id": "R100010", "name": "Vertex SaaS 10", "category": "Logistics", "region": "Europe", "value_usd": 3199.37, "quantity": 34, "score": 8.6, "active": false, "updated_at": "2025-04-19"}, {"id": "R100011", "name": "North Manufacturing 11", "category": "Real Estate", "region": "MEA", "value_usd": 3729.89, "quantity": 330, "score": 30.7, "active": true, "updated_at": "2025-08-12"}, {"id": "R100012", "name": "Peak Logistics 12", "category": "Education", "region": "LATAM", "value_usd": 1456.19, "quantity": 314, "score": 65.4, "active": false, "updated_at": "2025-01-15"}, {"id": "R100013", "name": "Quantum Education 13", "category": "Fintech", "region": "LATAM", "value_usd": 2225.36, "quantity": 56, "score": 76.5, "active": false, "updated_at": "2025-09-11"}, {"id": "R100014", "name": "Orbit Healthcare 14", "category": "Fintech", "region": "LATAM", "value_usd": 4664.45, "quantity": 237, "score": 92.1, "active": true, "updated_at": "2024-07-31"}, {"id": "R100015", "name": "Peak E-Commerce 15", "category": "Healthcare", "region": "MEA", "value_usd": 2505.02, "quantity": 176, "score": 86.0, "active": true, "updated_at": "2025-02-08"}, {"id": "R100016", "name": "Lumen Logistics 16", "category": "Fintech", "region": "LATAM", "value_usd": 4324.34, "quantity": 479, "score": 44.9, "active": false, "updated_at": "2024-04-29"}, {"id": "R100017", "name": "Summit Manufacturing 17", "category": "Real Estate", "region": "LATAM", "value_usd": 3916.58, "quantity": 298, "score": 56.3, "active": true, "updated_at": "2025-07-15"}, {"id": "R100018", "name": "Peak Real Estate 18", "category": "Real Estate", "region": "APAC", "value_usd": 4945.15, "quantity": 291, "score": 66.0, "active": false, "updated_at": "2025-01-18"}, {"id": "R100019", "name": "Alpha Healthcare 19", "category": "Healthcare", "region": "North America", "value_usd": 1137.63, "quantity": 467, "score": 43.3, "active": false, "updated_at": "2024-07-11"}, {"id": "R100020", "name": "Lumen Logistics 20", "category": "SaaS", "region": "Europe", "value_usd": 1765.86, "quantity": 407, "score": 26.5, "active": false, "updated_at": "2025-02-23"}, {"id": "R100021", "name": "Cedar Logistics 21", "category": "E-Commerce", "region": "Europe", "value_usd": 458.25, "quantity": 178, "score": 49.0, "active": true, "updated_at": "2024-02-20"}, {"id": "R100022", "name": "Quantum Healthcare 22", "category": "SaaS", "region": "APAC", "value_usd": 2697.13, "quantity": 330, "score": 91.8, "active": true, "updated_at": "2024-12-13"}, {"id": "R100023", "name": "Summit Fintech 23", "category": "Energy", "region": "MEA", "value_usd": 1188.92, "quantity": 426, "score": 62.8, "active": true, "updated_at": "2024-07-31"}, {"id": "R100024", "name": "Blue E-Commerce 24", "category": "Manufacturing", "region": "Europe", "value_usd": 4852.98, "quantity": 40, "score": 19.8, "active": true, "updated_at": "2025-03-30"}, {"id": "R100025", "name": "Bright SaaS 25", "category": "Education", "region": "MEA", "value_usd": 1481.41, "quantity": 205, "score": 46.4, "active": false, "updated_at": "2024-06-03"}, {"id": "R100026", "name": "Orbit Fintech 26", "category": "Energy", "region": "APAC", "value_usd": 445.47, "quantity": 322, "score": 31.8, "active": true, "updated_at": "2024-09-10"}, {"id": "R100027", "name": "Nova Logistics 27", "category": "Healthcare", "region": "MEA", "value_usd": 4087.97, "quantity": 25, "score": 21.3, "active": true, "updated_at": "2024-12-13"}, {"id": "R100028", "name": "Vertex Education 28", "category": "Retail", "region": "LATAM", "value_usd": 3527.78, "quantity": 86, "score": 35.3, "active": false, "updated_at": "2024-03-08"}, {"id": "R100029", "name": "Prime Energy 29", "category": "Education", "region": "LATAM", "value_usd": 1696.2, "quantity": 50, "score": 38.8, "active": true, "updated_at": "2024-08-23"}];
+let sortKey = null, sortDir = 1;
+function cols(){return DATA.length?Object.keys(DATA[0]):[]}
+function curated(){
+  const notes={}
+  // build a few headline cards from numeric columns
+  const c = cols(); const cards=[];
+  c.forEach(k=>{
+    const vals=DATA.map(r=>r[k]).filter(v=>typeof v==='number');
+    if(vals.length>DATA.length*0.5){
+      const sum=vals.reduce((a,b)=>a+b,0);
+      cards.push([k, (sum>=100000? '$'+Math.round(sum).toLocaleString() : Math.round(sum).toLocaleString())]);
+    }
+  });
+  return cards.slice(0,4);
+}
+function render(){
+  const cards=curated();
+  document.getElementById('cards').innerHTML=cards.map(([k,v])=>`<div class="card"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('');
+  const q=(document.getElementById('q').value||'').toLowerCase();
+  let rows=DATA.filter(r=>JSON.stringify(r).toLowerCase().includes(q));
+  if(sortKey) rows=rows.slice().sort((a,b)=>{const x=a[sortKey],y=b[sortKey];return (x>y?1:x<y?-1:0)*sortDir});
+  const c=cols();
+  let h='<thead><tr>'+c.map(k=>`<th onclick="sortBy('${k}')">${k}</th>`).join('')+'</tr></thead><tbody>';
+  h+=rows.map(r=>'<tr>'+c.map(k=>`<td>${fmt(r[k])}</td>`).join('')+'</tr>').join('');
+  document.getElementById('tbl').innerHTML=h+'</tbody>';
+}
+function fmt(v){if(v===true)return '<span class="pill p-ok">yes</span>';if(v===false)return '<span class="pill p-warn">no</span>';return v}
+function sortBy(k){if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=1}render()}
+function exportCsv(){
+  const c=cols();const lines=[c.join(',')].concat(DATA.map(r=>c.map(k=>`"${String(r[k]).replace(/"/g,'""')}"`).join(',')));
+  const blob=new Blob([lines.join('\n')],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='real-time-multi-language-meeting-transcr.csv';a.click();
+}
+render();
+</script>
+</body></html>
