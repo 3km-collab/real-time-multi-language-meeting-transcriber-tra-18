@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://3km-collab.github.io/real-time-multi-language-meeting-transcriber-tra-18/sitemap.xml
